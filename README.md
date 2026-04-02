@@ -122,6 +122,7 @@ obs-sles16/
 | [10](docs/10-topologias.md) | Topologias | Single-node (lab) e multi-node (produção) |
 | [11](docs/11-matriz-lab-prod.md) | Matriz Lab × Produção | Comparativo completo de decisões de configuração |
 | [12](docs/12-troubleshooting.md) | Troubleshooting | Todos os incidentes com causa raiz e resolução |
+| [13](docs/13-tuning.md) | Tuning | Otimização de MariaDB, Redis, Memcached, Apache, Passenger e OS |
 
 ---
 
