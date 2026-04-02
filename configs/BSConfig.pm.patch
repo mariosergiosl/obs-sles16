@@ -1,0 +1,32 @@
+# =============================================================================
+# BSConfig.pm.patch — Patch Cirúrgico (Fallback)
+# =============================================================================
+# Aplique este patch SOMENTE se o BSConfig.local.pm for ignorado pelo
+# bs_redis (ausência do hook de carregamento no BSConfig.pm da versão Unstable).
+#
+# ATENÇÃO: Edições diretas em BSConfig.pm são sobrescritas em atualizações
+# do pacote obs-server. Prefira sempre BSConfig.local.pm.
+#
+# Aplicação:
+#   sed -i "s/^1;$/\$redisserver = 'redis:\/\/127.0.0.1:6379';\n1;/" \
+#     /usr/lib/obs/server/BSConfig.pm
+#
+# Verificação:
+#   tail -n 5 /usr/lib/obs/server/BSConfig.pm
+#
+# Saída esperada após aplicação:
+#   $redisserver = 'redis://127.0.0.1:6379';
+#   1;
+# =============================================================================
+#
+# Contexto técnico identificado durante o troubleshooting (lab SLES 16):
+#
+# O código-fonte do bs_redis (linha 254) exige:
+#   die("No redis server configured\n") unless $BSConfig::redisserver;
+#   die("Redis server must be of scheme redis[s]://<server>[:port]\n")
+#     unless $BSConfig::redisserver =~ /^(rediss?):\/\/.../;
+#
+# Portanto:
+#   - Nome correto: $redisserver (SEM sublinhado — mudança silenciosa na branch Unstable)
+#   - Formato obrigatório: redis://<host>:<porta>  (não apenas <host>:<porta>)
+# =============================================================================

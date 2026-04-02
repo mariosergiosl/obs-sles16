@@ -1,0 +1,36 @@
+# =============================================================================
+# obsredis_final.te — Política SELinux Consolidada para obsredis (SLES 16)
+# =============================================================================
+# Permite que o daemon bs_redis (domínio init_t) crie e manipule o arquivo
+# FIFO .ping no diretório /srv/obs/events/redis/ (contexto var_t).
+#
+# Contexto: OBS branch Unstable no SLES 16 sem política SELinux nativa.
+# Gerado iterativamente via audit2allow durante provisionamento de laboratório.
+#
+# Aplicação:
+#   checkmodule -M -m -o /tmp/obsredis_final.mod configs/selinux/obsredis_final.te
+#   semodule_package -o /tmp/obsredis_final.pp -m /tmp/obsredis_final.mod
+#   semodule -i /tmp/obsredis_final.pp
+#
+# Verificação:
+#   semodule -l | grep obsredis
+#
+# Remoção (se necessário):
+#   semodule -r obsredis_final
+# =============================================================================
+
+module obsredis_final 1.0;
+
+require {
+    type init_t;
+    type var_t;
+    class fifo_file { create read write open ioctl };
+    class dir { add_name write search };
+}
+
+# Permite que bs_redis (init_t) crie, abra, leia, escreva e faça ioctl
+# no arquivo FIFO .ping com contexto var_t
+allow init_t var_t:fifo_file { create read write open ioctl };
+
+# Permite navegação e criação de arquivos no diretório pai (var_t)
+allow init_t var_t:dir { add_name write search };
