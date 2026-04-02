@@ -1,0 +1,63 @@
+# =============================================================================
+# obs-apache.te — Política SELinux para o Apache + OBS Frontend (SLES 16)
+# =============================================================================
+# Cobre quatro bloqueios SELinux identificados durante o provisionamento
+# do frontend OBS (Apache HTTPD + Phusion Passenger + Rails API):
+#
+#   1. Porta 82/tcp não mapeada em http_port_t
+#      → semanage port (tratado fora do módulo — ver instalação abaixo)
+#
+#   2. Certificado TLS sem contexto cert_t
+#      → chcon (tratado fora do módulo — ver instalação abaixo)
+#
+#   3. Booleans httpd_* desativados (proxy reverso, execmem)
+#      → setsebool (tratado fora do módulo — ver instalação abaixo)
+#
+#   4. Binários Ruby com contexto httpd_sys_content_t
+#      → allow para execução de conteúdo da aplicação
+#
+# Ver: docs/06-selinux.md#selinux-do-apache--frontend
+#
+# Instalação COMPLETA (módulo + comandos auxiliares):
+#   bash scripts/apply-selinux-policy.sh
+#
+# Instalação MANUAL apenas do módulo:
+#   checkmodule -M -m -o /tmp/obs-apache.mod configs/selinux/obs-apache.te
+#   semodule_package -o /tmp/obs-apache.pp -m /tmp/obs-apache.mod
+#   semodule -i /tmp/obs-apache.pp
+#
+# Comandos auxiliares obrigatórios (não cobertos pelo módulo):
+#   # Porta 82/tcp
+#   semanage port -a -t http_port_t -p tcp 82
+#
+#   # Booleans do Apache
+#   setsebool -P httpd_can_network_connect 1
+#   setsebool -P httpd_can_network_relay   1
+#   setsebool -P httpd_execmem             1
+#
+#   # Contexto do certificado TLS
+#   chcon -R -t cert_t /srv/obs/certs/
+#
+#   # Contexto dos binários Ruby da aplicação
+#   chcon -t bin_t /srv/www/obs/api/bin/clockworkd
+#   chcon -t bin_t /srv/www/obs/api/bin/delayed_job
+#
+# Verificação:
+#   semodule -l | grep obs-apache
+#
+# Remoção:
+#   semodule -r obs-apache
+# =============================================================================
+
+module obs-apache 1.0;
+
+require {
+    type httpd_t;
+    type httpd_sys_content_t;
+    class file { execute execute_no_trans read open getattr };
+    class process { transition };
+}
+
+# Permite que o Apache (httpd_t) execute binários Ruby da aplicação
+# que possuem contexto httpd_sys_content_t (causa do status=203/EXEC)
+allow httpd_t httpd_sys_content_t:file { execute execute_no_trans read open getattr };

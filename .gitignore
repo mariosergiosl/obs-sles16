@@ -6,6 +6,7 @@ configs/selinux/*.pp
 configs/BSConfig.*.local
 
 # Editores
+.claude/
 .vscode/
 *.swp
 *~

@@ -1,25 +1,31 @@
 # =============================================================================
-# obsredis_final.te — Política SELinux Consolidada para obsredis (SLES 16)
+# obsredis.te — Política SELinux para o daemon obsredis (bs_redis)
 # =============================================================================
-# Permite que o daemon bs_redis (domínio init_t) crie e manipule o arquivo
+# Permite que o bs_redis (domínio init_t) crie e manipule o arquivo
 # FIFO .ping no diretório /srv/obs/events/redis/ (contexto var_t).
 #
 # Contexto: OBS branch Unstable no SLES 16 sem política SELinux nativa.
-# Gerado iterativamente via audit2allow durante provisionamento de laboratório.
 #
-# Aplicação:
-#   checkmodule -M -m -o /tmp/obsredis_final.mod configs/selinux/obsredis_final.te
-#   semodule_package -o /tmp/obsredis_final.pp -m /tmp/obsredis_final.mod
-#   semodule -i /tmp/obsredis_final.pp
+# Processo de descoberta: 4 iterações com audit2allow durante o lab,
+# evoluindo do código de saída 13 (EACCES) até active (running).
+# Ver: docs/06-selinux.md#histórico-do-processo-obsredis
+#
+# Instalação:
+#   checkmodule -M -m -o /tmp/obsredis.mod configs/selinux/obsredis.te
+#   semodule_package -o /tmp/obsredis.pp -m /tmp/obsredis.mod
+#   semodule -i /tmp/obsredis.pp
+#
+# Ou use o script automatizado:
+#   bash scripts/apply-selinux-policy.sh
 #
 # Verificação:
 #   semodule -l | grep obsredis
 #
-# Remoção (se necessário):
-#   semodule -r obsredis_final
+# Remoção:
+#   semodule -r obsredis
 # =============================================================================
 
-module obsredis_final 1.0;
+module obsredis 1.0;
 
 require {
     type init_t;
