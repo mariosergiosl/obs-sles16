@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OBS SLES 16 — Topologia Single-Node (Laboratório)</title>
+<style>
+  body { font-family: sans-serif; background: #f8f8f6; margin: 0; padding: 24px; color: #2c2c2a; }
+  h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  p.sub { font-size: 13px; color: #5f5e5a; margin: 0 0 24px; }
+  svg { max-width: 860px; width: 100%; display: block; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1e1e1c; color: #d3d1c7; }
+    p.sub { color: #888780; }
+  }
+</style>
+</head>
+<body>
+<h1>OBS — Topologia Single-Node (Laboratório)</h1>
+<p class="sub">sles16BBOBS.lab · Todos os componentes no mesmo host · SLES 16 · OBS:Server:Unstable</p>
+<svg viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round"/>
+  </marker>
+</defs>
+
+<!-- Host container -->
+<rect x="10" y="10" width="580" height="480" rx="16" fill="#e6f1fb" stroke="#378add" stroke-width="1"/>
+<text x="30" y="38" font-size="14" font-weight="500" fill="#0c447c">sles16BBOBS.lab</text>
+<text x="30" y="56" font-size="12" fill="#185fa5">Single-node · Btrfs /srv · 13 GB · 192.168.56.x</text>
+
+<!-- Frontend -->
+<rect x="28" y="72" width="250" height="130" rx="10" fill="#e1f5ee" stroke="#1d9e75" stroke-width="1"/>
+<text x="153" y="96" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Frontend</text>
+<text x="153" y="114" text-anchor="middle" font-size="11" fill="#0f6e56">Apache HTTPD + Passenger</text>
+<text x="153" y="130" text-anchor="middle" font-size="11" fill="#0f6e56">OBS Rails API</text>
+<text x="153" y="146" text-anchor="middle" font-size="11" fill="#0f6e56">Delayed Jobs · Clockwork</text>
+<text x="153" y="162" text-anchor="middle" font-size="11" fill="#0f6e56">Memcached · :80 / :443</text>
+<text x="153" y="178" text-anchor="middle" font-size="11" fill="#0f6e56">obs-api-support.target</text>
+
+<!-- MariaDB -->
+<rect x="28" y="218" width="250" height="72" rx="10" fill="#eeedfe" stroke="#7f77dd" stroke-width="1"/>
+<text x="153" y="244" text-anchor="middle" font-size="13" font-weight="500" fill="#26215c">MariaDB</text>
+<text x="153" y="262" text-anchor="middle" font-size="11" fill="#3c3489">api_production · :3306</text>
+<text x="153" y="278" text-anchor="middle" font-size="11" fill="#3c3489">localhost only</text>
+
+<!-- SELinux -->
+<rect x="28" y="306" width="250" height="66" rx="10" fill="#f1efe8" stroke="#888780" stroke-width="1"/>
+<text x="153" y="330" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a">SELinux (Enforcing)</text>
+<text x="153" y="348" text-anchor="middle" font-size="11" fill="#5f5e5a">obsredis_final.pp instalado</text>
+<text x="153" y="364" text-anchor="middle" font-size="11" fill="#5f5e5a">httpd_can_network_connect · porta 82</text>
+
+<!-- Backend -->
+<rect x="298" y="72" width="274" height="218" rx="10" fill="#faece7" stroke="#d85a30" stroke-width="1"/>
+<text x="435" y="96" text-anchor="middle" font-size="13" font-weight="500" fill="#4a1b0c">Backend</text>
+<text x="435" y="114" text-anchor="middle" font-size="11" fill="#712b13">obssrcserver · :5252</text>
+<text x="435" y="130" text-anchor="middle" font-size="11" fill="#712b13">obsrepserver · :5352</text>
+<text x="435" y="146" text-anchor="middle" font-size="11" fill="#712b13">obsdispatcher</text>
+<text x="435" y="162" text-anchor="middle" font-size="11" fill="#712b13">obspublisher</text>
+<text x="435" y="178" text-anchor="middle" font-size="11" fill="#712b13">obsscheduler</text>
+<text x="435" y="194" text-anchor="middle" font-size="11" fill="#712b13">obswarden</text>
+<text x="435" y="210" text-anchor="middle" font-size="11" fill="#712b13">obsworker (local)</text>
+<text x="435" y="226" text-anchor="middle" font-size="11" fill="#712b13">obsredis (bs_redis)</text>
+<text x="435" y="250" text-anchor="middle" font-size="11" fill="#712b13">/srv/obs</text>
+<text x="435" y="272" text-anchor="middle" font-size="11" fill="#993c1d">BSConfig.local.pm → redis://127.0.0.1:6379</text>
+
+<!-- Redis -->
+<rect x="298" y="306" width="274" height="66" rx="10" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
+<text x="435" y="330" text-anchor="middle" font-size="13" font-weight="500" fill="#412402">Redis</text>
+<text x="435" y="348" text-anchor="middle" font-size="11" fill="#633806">redis@default.service · :6379</text>
+<text x="435" y="364" text-anchor="middle" font-size="11" fill="#633806">/etc/redis/default.conf · 127.0.0.1</text>
+
+<!-- Firewall band -->
+<rect x="28" y="388" width="544" height="46" rx="8" fill="#d3d1c7" stroke="#888780" stroke-width="0.5" fill-opacity="0.5"/>
+<text x="300" y="408" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a">firewalld</text>
+<text x="300" y="426" text-anchor="middle" font-size="11" fill="#444441">:80 :443 públicos · :5252 :5352 :6379 :3306 apenas loopback</text>
+
+<!-- Arrows -->
+<line x1="153" y1="202" x2="153" y2="218" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="278" y1="136" x2="298" y2="136" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="435" y1="290" x2="435" y2="306" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+
+<!-- VM Serviços -->
+<rect x="618" y="10" width="228" height="240" rx="12" fill="#eaf3de" stroke="#639922" stroke-width="1"/>
+<text x="732" y="36" text-anchor="middle" font-size="13" font-weight="500" fill="#173404">VM de Serviços</text>
+<text x="732" y="54" text-anchor="middle" font-size="11" fill="#3b6d11">192.168.56.200</text>
+<text x="732" y="80" text-anchor="middle" font-size="11" fill="#3b6d11">DNS / DHCP</text>
+<text x="732" y="98" text-anchor="middle" font-size="11" fill="#3b6d11">LDAP (389DS)</text>
+<text x="732" y="116" text-anchor="middle" font-size="11" fill="#3b6d11">SMB / FTP</text>
+<text x="732" y="134" text-anchor="middle" font-size="11" fill="#3b6d11">NFS</text>
+<text x="732" y="152" text-anchor="middle" font-size="11" fill="#3b6d11">Firewall</text>
+<text x="732" y="170" text-anchor="middle" font-size="11" fill="#3b6d11">hostPM</text>
+<text x="732" y="198" text-anchor="middle" font-size="11" fill="#27500a" font-style="italic">Integração LDAP</text>
+<text x="732" y="214" text-anchor="middle" font-size="11" fill="#27500a" font-style="italic">configurada na Fase 2</text>
+
+<!-- Network arrow -->
+<line x1="590" y1="200" x2="618" y2="200" stroke="#888780" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+<text x="604" y="192" text-anchor="middle" font-size="10" fill="#888780">rede interna</text>
+
+<!-- Internet input -->
+<rect x="618" y="280" width="228" height="60" rx="10" fill="#f1efe8" stroke="#888780" stroke-width="0.5"/>
+<text x="732" y="306" text-anchor="middle" font-size="12" font-weight="500" fill="#2c2c2a">Internet / Clientes</text>
+<text x="732" y="326" text-anchor="middle" font-size="11" fill="#5f5e5a">HTTP / HTTPS</text>
+
+<path d="M732 340 L732 460 L100 460 L100 434" stroke="#888780" stroke-width="1" stroke-dasharray="4 3" fill="none" marker-end="url(#arr)"/>
+
+<!-- Legend -->
+<rect x="618" y="370" width="228" height="120" rx="10" fill="#f1efe8" stroke="#888780" stroke-width="0.5"/>
+<text x="732" y="394" text-anchor="middle" font-size="12" font-weight="500" fill="#2c2c2a">Legenda</text>
+<rect x="636" y="406" width="12" height="12" rx="2" fill="#e1f5ee" stroke="#1d9e75"/>
+<text x="656" y="417" font-size="11" fill="#5f5e5a">Frontend / API</text>
+<rect x="636" y="424" width="12" height="12" rx="2" fill="#faece7" stroke="#d85a30"/>
+<text x="656" y="435" font-size="11" fill="#5f5e5a">Backend / Workers</text>
+<rect x="636" y="442" width="12" height="12" rx="2" fill="#faeeda" stroke="#ba7517"/>
+<text x="656" y="453" font-size="11" fill="#5f5e5a">Cache / Fila (Redis)</text>
+<rect x="636" y="460" width="12" height="12" rx="2" fill="#eeedfe" stroke="#7f77dd"/>
+<text x="656" y="471" font-size="11" fill="#5f5e5a">Banco de Dados</text>
+<rect x="636" y="478" width="12" height="12" rx="2" fill="#eaf3de" stroke="#639922"/>
+<text x="656" y="489" font-size="11" fill="#5f5e5a">Infraestrutura</text>
+</svg>
+</body>
+</html>

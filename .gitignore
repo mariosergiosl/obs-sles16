@@ -1,0 +1,17 @@
+# Arquivos compilados de política SELinux (gerados localmente pelo apply-selinux-policy.sh)
+configs/selinux/*.mod
+configs/selinux/*.pp
+
+# Overrides locais com credenciais reais — nunca versionar
+configs/BSConfig.*.local
+
+# Editores
+.vscode/
+*.swp
+*~
+
+# macOS
+.DS_Store
+
+# Temporários
+/tmp/
